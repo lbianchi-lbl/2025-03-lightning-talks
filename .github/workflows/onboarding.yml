@@ -1,0 +1,73 @@
+name: Onboarding
+run-name: Onboarding for ${{ inputs.project }}
+
+on:
+  workflow_dispatch:
+    inputs:
+
+      name:
+        description: First and last name
+        type: string
+        required: true
+
+      github-username:
+        description: GitHub username
+        type: string
+        required: true
+
+      project:
+        description: Project the onboarding is for
+        type: choice
+        options:
+          - Cupcake
+          - Pencilcase
+        required: true
+
+      role:
+        description: Role within the project
+        type: choice
+        options:
+          - maintainer
+          - developer
+          - user
+        required: false
+        default: 'user'
+
+      send-invite:
+        description: Whether to send the invite
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  generate-checklist:
+    name: Generate checklist
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Intro
+        run: |
+          echo '# Onboarding for ${{ inputs.project }}' >> $GITHUB_STEP_SUMMARY
+          echo 'Dear ${{ inputs.name }}, welcome to ${{ inputs.project }}. Please go through the steps below:' >> $GITHUB_STEP_SUMMARY
+      - name: Add common steps
+        run: |
+          echo '- [ ] Watch onboarding video'
+          echo '- [ ] Set up Python for your operating system'
+      - name: Add steps for developers
+        if: ${{ inputs.role != 'user' }}
+        run: |
+          echo '- [ ] Download Git' >> $GITHUB_STEP_SUMMARY
+          echo '- [ ] Create a GitHub account'
+      - name: Add steps for maintainer
+        if: ${{ inputs.role == 'maintainer' }}
+        run: |
+          echo '- [ ] Add `@${{ inputs.github-username }}` to maintainers group'
+
+  send-invite:
+    name: Send GitHub invite
+    if: ${{ inputs.send-invite }}
+    needs: [generate-checklist]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo '::notice Sent GitHub invite to ${{ inputs.github-username }}'
