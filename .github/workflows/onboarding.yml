@@ -1,5 +1,5 @@
 name: Onboarding
-run-name: Onboarding for ${{ inputs.project }}
+run-name: Onboarding for ${{ inputs.project }} / ${{ inputs.name }}
 
 on:
   workflow_dispatch:
@@ -51,17 +51,17 @@ jobs:
           echo 'Dear ${{ inputs.name }}, welcome to ${{ inputs.project }}. Please go through the steps below:' >> $GITHUB_STEP_SUMMARY
       - name: Add common steps
         run: |
-          echo '- [ ] Watch onboarding video'
-          echo '- [ ] Set up Python for your operating system'
+          echo '- [ ] Watch onboarding video' >> $GITHUB_STEP_SUMMARY
+          echo '- [ ] Set up Python for your operating system' >> $GITHUB_STEP_SUMMARY
       - name: Add steps for developers
         if: ${{ inputs.role != 'user' }}
         run: |
           echo '- [ ] Download Git' >> $GITHUB_STEP_SUMMARY
-          echo '- [ ] Create a GitHub account'
+          echo '- [ ] Create a GitHub account' >> $GITHUB_STEP_SUMMARY
       - name: Add steps for maintainer
         if: ${{ inputs.role == 'maintainer' }}
         run: |
-          echo '- [ ] Add `@${{ inputs.github-username }}` to maintainers group'
+          echo '- [ ] Add `@${{ inputs.github-username }}` to maintainers group' >> $GITHUB_STEP_SUMMARY
 
   send-invite:
     name: Send GitHub invite
